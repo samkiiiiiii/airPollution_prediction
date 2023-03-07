@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Raptor - Free Bootstrap 4 Template by Colorlib</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+
+    <link rel="stylesheet" href="css/aos.css">
+
+    <link rel="stylesheet" href="css/ionicons.min.css">
+
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
+
+    
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/style.css">
+
+<!--get AQHI by address-->
+
+
+      <script>
+
+          function cal(x1,y1,x2,y2) {
+              var s= (y2-y1)/(x2-x1);
+              return s;
+          }
+
+          function y_intercept(x1,y1,slope) {
+              // # y = mx + b
+              // # b = y - mx
+              // # b = P1[1] - slope * P1[0]
+              var  y=y1-slope*x1;
+              return y;
+          }
+
+          function slope(x1,y1,x2,y2) {
+              var s=(y2-y1)/(x2-x1);
+              return s;
+
+          }
+
+
+          function nearestPoint(x1,y1,x2,y2) {
+              var  slope1= (y2-y1)/(x2-x1);
+              var  slope =Math.pow(-1,1) / slope1;
+              return slope;
+          }
+
+          function line_intersect(m1,b1,m2,b2) {
+              if (m1==m2){
+                  return none;
+              }
+              x=(b2-b1)/(m1-m2);
+              y=m1*x+b1;
+              var r=[x,y];
+              return r;
+          }
+
+          function distance(x1,y1,x2,y2) {
+              var x= Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+              // console.log(x);
+              return x;
+          }
+
+          function ratio(d1,d2) {
+              var d = d1/(d1+d2);
+              return d;
+          }
+
+          function aqhiOfPoint(aqhi1,aqhi2,distanceRatio) {
+
+
+              var aqhi=(aqhi2 * distanceRatio) + (aqhi1*(1-distanceRatio));
+
+              return aqhi;
+          }
+
+          function getcurrentAQHI() {
+              var result=[4,4,5];
+              return result;
+          }
+
+
+          function findOutAQHI(x1,y1) {
+              var locaList = [['causewaybay', 22.2801379, 114.1829043],
+                  ['central', 22.2818189, 114.1559413],
+                  ['central/western', 22.317831, 114.194941],
+                  ['eastern', 22.2477915, 114.1496074],
+                  ['kwaichung', 22.3283503, 114.0142057],
+                  ['kwuntong', 22.3133199, 114.2226423],
+                  ['mongkok', 22.3226159, 114.1660853],
+                  ['shamshuipo', 22.3302309, 114.1569233]
+                  , ['shatin', 22.3762849, 114.1823453],
+                  ['taipo', 22.4509649, 114.1623843]
+                  , ['tapmun', 22.4713209, 114.3585323]
+                  , ['tseungkwano', 22.3261644, 114.1147959]
+                  , ['tsuenwan', 22.3260131, 114.114796],
+                  ['tuenmun', 22.4181877, 113.9821814]
+                  , ['tungchung', 22.2888939, 113.9414723],
+                  ['yuenlong', 22.4451599, 114.0204623]];
+              var d = 100;
+              var aqhi = [];
+              for (var x = 0; x < locaList.length; x++) {
+                  for (var y = 0; y < locaList.length; y++) {
+                      if (x == y)
+                          continue;
+                      else {
+
+                          var slope_A = slope((locaList[x][1]), (locaList[x][2]), (locaList[y][1]), (locaList[y][2]));
+                          var slope_B = nearestPoint((locaList[x][1]), (locaList[x][2]), (locaList[y][1]), (locaList[y][2]));
+                          var y_int_A = y_intercept((locaList[x][1]), (locaList[x][2]), slope_A);
+                          var y_int_B = y_intercept(x1, y1, slope_B);
+                          var p2 = line_intersect(slope_A, y_int_A, slope_B, y_int_B);
+
+                          var distance1 = distance((locaList[x][1]), (locaList[x][2]), p2[0], p2[1]);
+                          var distance2 = distance((locaList[y][1]), (locaList[y][2]), p2[0], p2[1]);
+
+                          if (d > (distance1 + distance2)) {
+
+                              var distance1Ratio = ratio(distance1, distance2);
+                              var locationOne = getcurrentAQHI(locaList[x][0]);
+                              var locationTwo = getcurrentAQHI(locaList[y][0]);
+                              // console.log('dis'+locationTwo);
+                              for (var count = 0; count < 3; count++) {
+                                  yy = aqhiOfPoint(locationOne[count], locationTwo[count], distance1Ratio);
+                                  // console.log(yy);
+                                  aqhi[count]=yy;
+
+
+
+
+
+                              }
+
+                          }
+
+                      }
+
+                  }
+              }
+              return aqhi;
+          }
+
+
+          function test2() {
+
+          }
+
+          function test() {
+              var  x= findOutAQHI(4,4);
+              console.log(x);
+          }
+
+
+      </script>
+
+      <!--for log and lan-->
+      <script>
+          var x = document.getElementById("demo");
+
+          function getLocation() {
+              if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(showPosition);
+              } else {
+                  x.innerHTML = "Geolocation is not supported by this browser.";
+              }
+          }
+
+          function showPosition(position) {
+              var info="";
+              var x = document.getElementById("demo");
+              x.innerHTML = "Latitude: " + position.coords.latitude +
+                  "<br>Longitude: " + position.coords.longitude;
+              var ge= findOutAQHI(position.coords.latitude,position.coords.longitude);
+              console.log(typeof ge.toString());
+              var res = ge.toString().split(",");
+              var color=["orange","orange","orange"];
+              for (var i=0; i<3;i++){
+                 if (res[i]<4){
+                     color[i]="green";
+                 }
+                  else if (res[i]=7){
+                      color[i]="red";
+                  }
+                 else  if (res[i]>=8 && res[i] <= 10){
+                      color[i]="brown";
+                  }
+                  else if(res[i]>=11){
+                     color[i]="black";
+                 }
+
+
+              }
+
+              info += "<p style=\"color: "+color[0]+";\">"+ "One Hour Later :" + res[0]+"</p>";
+              info +="<p style=\"color: "+color[1]+";\">"+ "Two Hour Later :" + res[1]+"</p>";
+              info +="<p style=\"color: "+color[2]+";\">"+ "Three Hour Later :" + res[2]+"</p>";
+
+              x.innerHTML = info;
+
+
+          }
+
+
+      </script>
+      <script>
+          var geocoder;
+          var map;
+          var x;
+
+          function codeAddress() {
+              var result;
+              geocoder = new google.maps.Geocoder();
+              console.log(geocoder);
+
+              var address = document.getElementById('address').value;
+              geocoder.geocode( { 'address': address}, function(results, status) {
+                  if (status == 'OK') {
+
+                      result = results[0].geometry.location.toString();
+
+                      var res = result.split(",");
+
+                      var lan=res[0].substring(1,res[0].length);
+                      var lon=res[1].substring(1,res[0].length);
+
+                      //return  AQHI
+                      var aqhi= findOutAQHI(lan,lon);
+                      alert(aqhi);
+                  } else {
+                      alert('Geocode was not successful for the following reason: ' + status);
+                  }
+              });
+
+
+          }
+
+
+      </script>
+
+      <!--for log and lan-->
+      <script>
+          var x = document.getElementById("demo");
+
+          function getLocation() {
+              if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(showPosition);
+              } else {
+                  x.innerHTML = "Geolocation is not supported by this browser.";
+              }
+          }
+
+          function showPosition(position) {
+              var x = document.getElementById("demo");
+              x.innerHTML = "Latitude: " + position.coords.latitude +
+                  "<br>Longitude: " + position.coords.longitude;
+              var ge= findOutAQHI(position.coords.latitude,position.coords.longitude);
+              var res = ge.split(",");
+
+
+              //return  AQHI
+         var res = result.split(",");
+
+              // var lan=res[0].substring(1,res[0].length);
+              // var lon=res[1].substring(1,res[0].length);
+              //
+              //
+              alert(res);
+              x.innerHTML = ge[0];
+              alert(ge);
+
+          }
+
+
+      </script>
+
+      <style>
+
+
+          #aqhiReference, td, th {
+              border: 1px solid #ddd;
+              text-align: left;
+          }
+
+          #aqhiReference {
+              border-collapse: collapse;
+              width: 100%;
+              color: black;
+          }
+
+          #aqhiReference, th, td {
+              padding: 15px;
+          }
+
+
+      </style>
+
+  </head>
+  <body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html" onclick="getLocation()">GetAQHI.</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+
+      </button>
+
+    </div>
+  </nav>
+    <!-- END nav -->
+    
+    <div class="hero-wrap">
+      <div class="overlay"></div>
+      <div class="circle-bg"></div>
+      <div class="circle-bg-2"></div>
+      <div class="container-fluid">
+        <div class="slider-text d-md-flex align-items-center" data-scrollax-parent="true">
+
+          <div class="one-forth pr-md-4 ftco-animate align-self-md-center" data-scrollax=" properties: { translateY: '70%' }">
+          	<h1 class="mb-4" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Find. <br> AQHI. <br> by location.</h1>
+            <p class="mb-md-5 mb-sm-3" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Find out the aqhi by input an address or GPS</p>
+            <p data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><a href="#" class="btn btn-primary px-4 py-3">Get started</a></p>
+          </div>
+          <div class="one-half align-self-md-end align-self-sm-center">
+          	<div class="slider-carousel owl-carousel">
+          		<div class="item">
+			          <img src="images/gps.jpeg" style="width: 550px;height: 350px" class="img-fluid img"alt="">
+		          </div>
+                <div class="item">
+                    <img src="images/dashboard_full_3.png" class="img-fluid img"alt="">
+                </div>
+		          <div class="item">
+			          <img src="images/gps2.png" style="width: 550px;height: 350px" class="img-fluid img"alt="">
+		          </div>
+
+	          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <section class="ftco-section bg-light">
+    	<div class="container">
+    		<div class="row justify-content-center mb-5 mt-5">
+          <div class="col-md-7 text-center heading-section ftco-animate">
+
+            <h2 class="mb-4">Input Address to get AQHI</h2>
+            <p>Input an address to get AQHI</p>
+          </div>
+        </div>
+    		<div class="row justify-content-center">
+    			<div class="col-md-8 ftco-animate">
+    				<form action="#" class="domain-form">
+              <div class="form-group d-md-flex">
+                <input id="address" type="text" class="form-control px-4" placeholder="Enter Address">
+                <input type="button" class="search-domain btn btn-primary px-5" value="Find AQHI" onclick="codeAddress()">
+              </div>
+            </form>
+                    <script async defer
+                            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSoruTeCmzsvdNkzwXWw2dgwopdg8tu0c&callback=initMap"></script>
+            <h2 class="domain-price text-center" id="result"></h2>
+    			</div>
+    		</div>
+    	</div>
+    </section>
+  
+
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row justify-content-center mb-5 pb-5">
+    			<div class="col-md-7 text-center heading-section ftco-animate">
+
+            <h2 class="mb-4">Use GPS to get AQHI</h2>
+          </div>
+    		</div>
+    		<div class="row">
+          <div class="col-md-12 nav-link-wrap mb-5 pb-md-5 pb-sm-1 ftco-animate">
+            <div class="nav ftco-animate nav-pills justify-content-center text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <a class="nav-link active" onclick="getLocation()" id="v-pills-nextgen-tab" data-toggle="pill" href="#v-pills-nextgen" role="tab" aria-controls="v-pills-nextgen" aria-selected="true">Get AQHI</a>
+
+              <a class="nav-link" id="v-pills-performance-tab" data-toggle="pill" href="#v-pills-performance" role="tab" aria-controls="v-pills-performance" aria-selected="false">Introduction</a>
+
+              <a class="nav-link" id="v-pills-effect-tab" data-toggle="pill" href="#v-pills-effect" role="tab" aria-controls="v-pills-effect" aria-selected="false">AQHI level</a>
+            </div>
+          </div>
+          <div class="col-md-12 align-items-center ftco-animate">
+            
+            <div class="tab-content ftco-animate" id="v-pills-tabContent">
+
+              <div class="tab-pane fade show active" id="v-pills-nextgen" role="tabpanel" aria-labelledby="v-pills-nextgen-tab">
+              	<div class="d-md-flex">
+	              	<div class="one-forth align-self-center">
+	              		<img src="images/aqhiBGC.png" class="img-fluid border" alt="">
+	              	</div>
+	              	<div class="one-half ml-md-5 align-self-center">
+		                <h2 class="mb-4" id="demo"></h2>
+
+		              </div>
+	              </div>
+              </div>
+
+              <div class="tab-pane fade" id="v-pills-performance" role="tabpanel" aria-labelledby="v-pills-performance-tab">
+                <div class="d-md-flex">
+	              	<div class="one-forth order-last align-self-center">
+	              		<img src="images/gps.jpeg" class="img-fluid border" alt="">
+	              	</div>
+	              	<div class="one-half order-first mr-md-5 align-self-center">
+		                <h2 class="mb-4">Introduction</h2>
+		              	<p>You should open your GPS to get air quality level(AQHI)</p>
+
+		              </div>
+	              </div>
+              </div>
+
+              <div class="tab-pane fade" id="v-pills-effect" role="tabpanel" aria-labelledby="v-pills-effect-tab">
+
+
+	              	<div class="nav ftco-animate nav-pills justify-content-center text-center">
+
+
+                        <table id="aqhiReference">
+                            <tr>
+                                <td>Low</td>
+                                <td>1-3</td>
+                            </tr>
+                            <tr>
+                                <td>Moderate</td>
+                                <td>4-6</td>
+                            </tr>
+                            <tr>
+                                <td>High</td>
+                                <td>7</td>
+                            </tr>
+                            <tr>
+                                <td>Very High</td>
+                                <td>8-10</td>
+                            </tr>
+                            <tr>
+                                <td>Serious</td>
+                                <td>10+</td>
+                            </tr>
+                        </table>
+
+	              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    	</div>
+    </section>
+
+    <section class="ftco-section-parallax">
+      <div class="parallax-img d-flex align-items-center">
+        <div class="container">
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-7 text-center heading-section heading-section-white ftco-animate">
+              <h2>Subcribe to our Newsletter</h2>
+              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in</p>
+              <div class="row d-flex justify-content-center mt-5">
+                <div class="col-md-6">
+                  <form action="#" class="subscribe-form">
+                    <div class="form-group">
+                      <span class="icon icon-paper-plane"></span>
+                      <input type="text" class="form-control" placeholder="Enter email address">
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section bg-light">
+      <div class="container">
+        <div class="row justify-content-center mb-5 pb-5">
+          <div class="col-md-7 text-center heading-section ftco-animate">
+            <span class="subheading">Blog</span>
+            <h2>Recent Blog</h2>
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 ftco-animate">
+            <div class="blog-entry">
+              <a href="blog-single.html" class="block-20" style="background-image: url('images/image_1.jpg');">
+              </a>
+              <div class="text p-4 d-block">
+                <div class="meta mb-3">
+                  <div><a href="#">August 12, 2018</a></div>
+                  <div><a href="#">Admin</a></div>
+                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
+                </div>
+                <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 ftco-animate">
+            <div class="blog-entry" data-aos-delay="100">
+              <a href="blog-single.html" class="block-20" style="background-image: url('images/image_2.jpg');">
+              </a>
+              <div class="text p-4">
+                <div class="meta mb-3">
+                  <div><a href="#">August 12, 2018</a></div>
+                  <div><a href="#">Admin</a></div>
+                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
+                </div>
+                <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 ftco-animate">
+            <div class="blog-entry" data-aos-delay="200">
+              <a href="blog-single.html" class="block-20" style="background-image: url('images/image_3.jpg');">
+              </a>
+              <div class="text p-4">
+                <div class="meta mb-3">
+                  <div><a href="#">August 12, 2018</a></div>
+                  <div><a href="#">Admin</a></div>
+                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
+                </div>
+                <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="ftco-footer ftco-bg-dark ftco-section">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Raptor.</h2>
+              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+              <p class="mt-4"><a href="#" class="btn btn-primary p-3">Get in touch</a></p>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4 ml-md-5">
+              <h2 class="ftco-heading-2">Unseful Links</h2>
+              <ul class="list-unstyled">
+                <li><a href="#" class="py-2 d-block">Servers</a></li>
+                <li><a href="#" class="py-2 d-block">Windos Hosting</a></li>
+                <li><a href="#" class="py-2 d-block">Cloud Hosting</a></li>
+                <li><a href="#" class="py-2 d-block">OS Servers</a></li>
+                <li><a href="#" class="py-2 d-block">Linux Servers</a></li>
+                <li><a href="#" class="py-2 d-block">Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+             <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Navigational</h2>
+              <ul class="list-unstyled">
+                <li><a href="#" class="py-2 d-block">Home</a></li>
+                <li><a href="#" class="py-2 d-block">Domain</a></li>
+                <li><a href="#" class="py-2 d-block">Hosting</a></li>
+                <li><a href="#" class="py-2 d-block">About</a></li>
+                <li><a href="#" class="py-2 d-block">Blog</a></li>
+                <li><a href="#" class="py-2 d-block">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+            	<div class="block-23 mb-3">
+	              <ul>
+	                <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
+	                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a></li>
+	                <li><a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a></li>
+	                <li><span class="icon icon-clock-o"></span><span class="text">Saturday &mdash; Sunday 8:00am - 5:00pm</span></li>
+	              </ul>
+	            </div>
+              <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
+                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
+                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
+                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-center">
+
+            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+  
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/bootstrap-datepicker.js"></script>
+  <script src="js/jquery.timepicker.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+    
+  </body>
+</html>
